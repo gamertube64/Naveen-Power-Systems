@@ -366,9 +366,16 @@ let clientGST = document.getElementById("clientGSTIN").value.substring(0, 2);
             document.getElementById('igst').innerText = taxTotal.toFixed(2);
         }
 
-        let final = subTotal + taxTotal;
-        document.getElementById('grandTotal').innerText = final.toFixed(2);
-        document.getElementById('totalInWords').innerText = numberToWords(Math.round(final)) + " Rupees Only";
+       let final = subTotal + taxTotal;
+
+// Round the final total
+let roundedFinal = Math.round(final);
+
+// Show rounded total
+document.getElementById('grandTotal').innerText = roundedFinal.toFixed(0);
+
+// Convert rounded total into words
+document.getElementById('totalInWords').innerText = numberToWords(roundedFinal);
     }
 
     
@@ -431,4 +438,5 @@ function syncBuyer(){
 </script>
 </body>
 </html>
+
 
