@@ -36,7 +36,7 @@
         input:focus, textarea:focus { border: 1px solid #000; outline: none; background: #fff; }
         
         .no-print { position: fixed; bottom: 20px; right: 20px; background: #2c3e50; color: white; padding: 15px; border-radius: 50px; cursor: pointer; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        @media print { .no-print, .add-row-btn { display: none; } body { background: white; padding: 0; } .invoice-card { border: 1px solid #000; box-shadow: none; width: 100%; } input, textarea { border: none; resize: none; background: transparent; } }
+        @media print { .no-print, .add-row-btn { display: none; } body { background: white; padding: 0; } .-card { border: 1px solid #000; box-shadow: none; width: 100%; } input, textarea { border: none; resize: none; background: transparent; } }
         .sin_line {
             text-decoration: underline;
         }
@@ -68,7 +68,7 @@
 </head>
 <body>
 
-<div class="invoice-header">
+<div class="-header">
     <img src="New Logo (1).png" class="logo">
 </div>
 
@@ -90,7 +90,7 @@
         </div>
         <div class="w-50 padding-5">
             <div class="flex border-bottom">
-                <div class="w-50 border-right padding-5">Invoice No.<br><input type="text" value="INV/001/25-26"></div>
+                <div class="w-50 border-right padding-5">Invoice No.<br><input type="text" value="NPS/2026-27/"></div>
                 <div class="w-50 padding-5">Dated<br><input type="date" id="invDate"></div>
             </div>
             <div class="flex border-bottom">
@@ -431,3 +431,4 @@ function syncBuyer(){
 </script>
 </body>
 </html>
+
