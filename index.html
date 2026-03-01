@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Professional Tally Style Invoice</title>
+    <style>
+        .logo{
+            position: relative;
+            top: -15px;
+            max-width: 1500px;
+            height: 100px;
+        }
+        body { font-family: 'Arial', sans-serif; background: #f0f0f0; padding: 20px; font-size: 12px; }
+        .invoice-card { background: #fff; max-width: 850px; margin: auto; border: 1px solid #000; padding: 2px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .border-bottom { border-bottom: 1px solid #000; }
+        .border-right { border-right: 1px solid #000;}
+        .border-left { border-left: 1px solid #000;}
+        .padding-5 { padding: 8px; }
+        .padding-3 { padding-left: 0; padding-right: 20px; padding-top: 8px; padding-bottom: 8px;}
+        .padding-4 { padding-top: 8px; padding-bottom: 8px; padding-left: 0px; padding-right: 0%; margin-left: 0px;}
+        .flex { display: flex; }
+        .w-50 { width: 50%;}
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .bold { font-weight: bold; }
+        
+        /* Table Styling like Tally */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #000; padding: 5px; vertical-align: top; }
+        .items-table { border-left: none; border-right: none; }
+        .items-table th { background: #f2f2f2; }
+        .min-height-rows { height: 250px; }
+
+        input, textarea { border: 1px dashed #ccc; width: 95%; font-family: inherit; font-size: 12px; }
+        input:focus, textarea:focus { border: 1px solid #000; outline: none; background: #fff; }
+        
+        .no-print { position: fixed; bottom: 20px; right: 20px; background: #2c3e50; color: white; padding: 15px; border-radius: 50px; cursor: pointer; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        @media print { .no-print, .add-row-btn { display: none; } body { background: white; padding: 0; } .invoice-card { border: 1px solid #000; box-shadow: none; width: 100%; } input, textarea { border: none; resize: none; background: transparent; } }
+        .sin_line {
+            text-decoration: underline;
+        }
+        .bank-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.bank-row span {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.bank-row input {
+    width: 50%;
+    border: none;
+    border-bottom: 1px dashed #000;
+    outline: none;
+    font-size: 12px;
+}
+
+.rec-sig {
+    float: left;
+    border-top: 1px dashed #000;
+}
+    </style>
+</head>
+<body>
+
+<div class="invoice-header">
+    <img src="New Logo (1).png" class="logo">
+</div>
+
+
+
+<div class="invoice-card" id="printArea">
+    <div class="text-center border-bottom padding-5">
+        <h2 style="margin: 0;">TAX INVOICE</h2>
+    </div>
+
+    <div class="flex border-bottom">
+        <div class="w-50 border-right padding-5">
+            <div class="bold"><h2>NAVEEN POWER SYSTEMS</h2></div>
+            <p>A-6, Laxmi Garden, Delhi - Saharanpur Road, Opp-Shiv Dharam
+                Kanta, 2 no, Loni Ghaziabad UP- 201102, Ghaziabad, Uttar
+                Pradesh, 201102</p>
+                <p><strong>Phone No. :</strong> 9313070521</p>
+            <strong>GSTIN/UIN:</strong> <input type="text" value="09CEMPA6504H1ZK" id="myGSTIN" oninput="calculate()"style="width: 150px;"><br>
+        </div>
+        <div class="w-50 padding-5">
+            <div class="flex border-bottom">
+                <div class="w-50 border-right padding-5">Invoice No.<br><input type="text" value="INV/001/25-26"></div>
+                <div class="w-50 padding-5">Dated<br><input type="date" id="invDate"></div>
+            </div>
+            <div class="flex border-bottom">
+                <div class="w-50 border-right padding-5">Place of Supply<br><span id="posLabel" class="bold">-<br></span></div>
+                <div class="w-50 padding-5">Mode of Payment<br><input type="text" value="Cash / Bank Transfer"></div>
+            </div>
+             <div class="flex">
+                <div class="w-50 padding-5 border-right">E-Way No.<br><input type="text" value="N/A"></div>
+                <div class="w-50 padding-5">Vehicle No.<br><input type="text" value="N/A" ></div>
+            </div>
+        </div>
+            
+    </div>
+
+    <div class="flex border-bottom">
+        <div class="w-50 border-right padding-5">
+            <div class="bold">Buyer (Bill to)</div>
+           <input type="text" id="buyerName" placeholder="Customer Name" class="bold" oninput="syncBuyer()"><br>
+            <textarea rows="3" id="buyerAddress" placeholder="Customer Address" oninput="syncBuyer()"></textarea><br>
+            <strong>GSTIN/UIN:</strong> <input type="text" id="clientGSTIN" placeholder="N/A" oninput="calculate()" style="width: 150px;">
+        </div>
+        <div class="w-50 padding-5">
+            <div class="bold">Consignee (Ship to)</div>
+            <input type="text" id="consigneeName" placeholder="Same as above (Or different name)" class="bold"><br>
+            <textarea rows="3" id="consigneeAddress" placeholder="Delivery Address"></textarea>
+
+        </div>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th width="5%">Sl No.</th>
+                <th width="45%">Description of Goods</th>
+                <th>HSN/SAC</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>GST%</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody id="itemRows" class="min-height-rows">
+            <tr>
+                <td class="text-center">1</td>
+                <td><textarea placeholder="Product Description" rows="3" style="width:95%; resize:vertical;"></textarea>
+
+                <td><input type="text" style="width: 60px;"></td>
+                <td><input type="number" value="1" class="qty" oninput="calculate()"></td>
+                <td><input type="number" value="0" class="rate" oninput="calculate()"></td>
+                <td>
+                    <select class="gst" onchange="calculate()">
+                        <option value="0">0%</option> <option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option>
+                    </select>
+                </td>
+                <td class="text-right">₹<span class="row-total">0.00</span></td>
+            </tr>
+        </tbody>
+        <button class="add-row-btn" onclick="addRow()" style="margin: 5px;">+ Add Item</button>
+        <button class="add-row-btn" onclick="subRow()" style="margin: 5px;">- Sub Item</button>
+    </table>
+
+    <div class="flex border-bottom">
+        <div class="w-50 border-right padding-4">
+            <div>&nbsp;&nbsp;&nbsp;Amount Chargeable (in words):</div>
+            <div class="bold" id="totalInWords" style="text-transform: capitalize; margin-top: 5px;">&nbsp;&nbsp;&nbsp;&nbsp;Zero Rupees Only</div>
+        </div>
+        <div class="w-50">
+            <table style="border: none;">
+               <tr>
+   <td>Taxable value</td>
+   <td class="text-right">₹ <span id="taxableValue">0.00</span></td>
+</tr>
+
+                <tr id="cgstRow"><td>CGST</td><td class="text-right">₹<span id="cgst">0.00</span></td></tr>
+                <tr id="sgstRow"><td>SGST</td><td class="text-right">₹<span id="sgst">0.00</span></td></tr>
+                <tr id="igstRow" style="display:none;"><td>IGST</td><td class="text-right">₹<span id="igst">0.00</span></td></tr>
+                <tr class="bold" style="background: #eee;"><td>Total</td><td class="text-right">₹<span id="grandTotal">0.00</span></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="flex">
+        <div class="w-50 padding-5">
+            <div class="bold sin_line">Bank Details:</div><br>
+          
+    <div>Bank Name:</div>
+    <input type="text" value="Punjab & Sind Bank, LONI BORDER GHAZIABAD UP"><br><br>
+<div class="bank-row">
+    <span>&nbsp;A/c No:</span>
+    <input type="text" value="07041100051269">
+
+    <span>IFSC:</span>
+    <input type="text" value="PSIB0000704">
+</div>
+
+            <div style="margin-top: 10px;">
+                <div class="bold">Terms & Conditions:</div>
+                <small>
+                    1.  All Disputed are subjected to (GZB)
+                        jurisdiction.<br>
+                    2.  Goods once sold will not be taken back or
+                        replaces.<br>
+                    3.  Interest will be charged @24% after due
+                        date if bill is not paid within 15days.<br>
+                    4.  Seller is not responsible for any damage
+                        or goods in transit.
+                </small>
+            </div>
+        </div>
+
+       
+        <div class="w-50 text-right border-left padding-5" style="display: flex; flex-direction: column; justify-content: space-between;">
+            
+            <div><span class="bold">NAVEEN POWER SYSTEMS</span></div>
+        <div><span class="rec-sig">Receiver Signatory</span>
+            <div style="margin-bottom: 20px;">
+                Authorized Signatory
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<button class="no-print" onclick="window.print()">Print / Save PDF</button>
+
+<script>
+    document.getElementById('invDate').valueAsDate = new Date();
+
+
+    const stateCodes = {
+        "01": "Jammu & Kashmir",
+        "02": "Himachal Pradesh",
+        "03": "Punjab",
+        "04": "Chandigarh",
+        "05": "Uttarakhand",
+        "06": "Haryana",
+        "07": "Delhi",
+        "08": "Rajasthan",
+        "09": "Uttar Pradesh",
+        "10": "Bihar",
+        "11": "Sikkim",
+        "12": "Arunachal Pradesh",
+        "13": "Nagaland",
+        "14": "Manipur",
+        "15": "Mizoram",
+        "16": "Tripura",
+        "17": "Meghalaya",
+        "18": "Assam",
+        "19": "West Bengal",
+        "20": "Jharkhand",
+        "21": "Odisha",
+        "22": "Chhattisgarh",
+        "23": "Madhya Pradesh",
+        "24": "Gujarat",
+        "25": "Daman and Diu",
+        "26": "Dadra and Nagar Haveli",
+        "27": "Maharashtra",
+        "28": "Andhra Pradesh (Old)",
+        "29": "Karnataka",
+        "30": "Goa",
+        "31": "Lakshadweep",
+        "32": "Kerala",
+        "33": "Tamil Nadu",
+        "34": "Puducherry",
+        "35": "Andaman and Nicobar Islands",
+        "36": "Telangana",
+        "37": "Andhra Pradesh",
+        "38": "Ladakh",
+        "97": "Other Territory",
+        "99": "Other Country"
+    };
+   
+function addRow() {
+  let tbody = document.getElementById("itemRows");
+  let rowCount = tbody.rows.length + 1;
+
+  let row = tbody.insertRow();
+
+  row.innerHTML = `
+    <td class="text-center">${rowCount}</td>
+
+    <td>
+      <textarea placeholder="Product Description" rows="3"
+      style="width:95%; resize:vertical;"></textarea>
+    </td>
+
+    <td><input type="text" style="width:60px"></td>
+
+    <td><input type="number" value="1" class="qty" oninput="calculate()"></td>
+
+    <td><input type="number" value="0" class="rate" oninput="calculate()"></td>
+
+    <td>
+      <select class="gst" onchange="calculate()">
+        <option value="0">0%</option>
+        <option value="5">5%</option>
+        <option value="12">12%</option>
+         <option value="18" selected>18%</option>
+        <option value="28">28%</option>
+      </select>
+    </td>
+
+    <td class="text-right">₹<span class="row-total">0.00</span></td>
+  `;
+}
+
+    function subRow() {
+        let table = document.getElementById('itemRows');
+        let rowCount = table.rows.length;
+        if (rowCount > 1) {
+            table.deleteRow(rowCount - 1);
+        }
+    }
+
+    function calculate() {
+
+        let myGST = document.getElementById("myGSTIN").value.substring(0, 2);
+let clientGST = document.getElementById("clientGSTIN").value.substring(0, 2);
+
+
+    // 🔥 YAHAN NEW CODE
+    let myGSTIN = document.getElementById("myGSTIN").value.trim();
+    let clientGSTIN = document.getElementById("clientGSTIN").value.trim();
+
+    let posStateCode = "";
+
+    if (clientGSTIN !== "") {
+        posStateCode = clientGSTIN.substring(0, 2);
+    } else if (myGSTIN !== "") {
+        posStateCode = myGSTIN.substring(0, 2);
+    }
+
+    document.getElementById("posLabel").innerText =
+        stateCodes[posStateCode] || "";
+
+    // 🔥 YAHAN SE TUMHARA BAaki Existing Code
+
+
+
+        let rows = document.querySelectorAll('#itemRows tr');
+        let subTotal = 0, taxTotal = 0;
+
+        rows.forEach(row => {
+            let q = row.querySelector('.qty').value || 0;
+            let r = row.querySelector('.rate').value || 0;
+            let g = row.querySelector('.gst').value || 0;
+            let amt = q * r;
+            row.querySelector('.row-total').innerText = amt.toFixed(2);
+            subTotal += amt;
+            taxTotal += (amt * g) / 100;
+        });
+            document.getElementById('taxableValue').innerText = subTotal.toFixed(2);
+
+        
+        if (myGST === clientGST && myGST !== "") {
+            document.getElementById('cgstRow').style.display = 'table-row';
+            document.getElementById('sgstRow').style.display = 'table-row';
+            document.getElementById('igstRow').style.display = 'none';
+            document.getElementById('cgst').innerText = (taxTotal/2).toFixed(2);
+            document.getElementById('sgst').innerText = (taxTotal/2).toFixed(2);
+        } 
+        else if (clientGST === "" && myGST !== "") {
+            document.getElementById('cgstRow').style.display = 'table-row';
+            document.getElementById('sgstRow').style.display = 'table-row';
+            document.getElementById('igstRow').style.display = 'none';
+           document.getElementById('cgst').innerText = (taxTotal/2).toFixed(2);
+            document.getElementById('sgst').innerText = (taxTotal/2).toFixed(2);
+        }
+        else {
+            document.getElementById('cgstRow').style.display = 'none';
+            document.getElementById('sgstRow').style.display = 'none';
+            document.getElementById('igstRow').style.display = 'table-row';
+            document.getElementById('igst').innerText = taxTotal.toFixed(2);
+        }
+
+        let final = subTotal + taxTotal;
+        document.getElementById('grandTotal').innerText = final.toFixed(2);
+        document.getElementById('totalInWords').innerText = numberToWords(Math.round(final)) + " Rupees Only";
+    }
+
+    
+   function numberToWords(num) {
+    if (num === 0) return "Zero";
+
+    const a = [
+        "", "One", "Two", "Three", "Four", "Five", "Six",
+        "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
+        "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+        "Seventeen", "Eighteen", "Nineteen"
+    ];
+
+    const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty",
+        "Sixty", "Seventy", "Eighty", "Ninety"
+    ];
+
+    function twoDigits(n) {
+        if (n < 20) return a[n];
+        return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+    }
+
+    function threeDigits(n) {
+        let str = "";
+        if (Math.floor(n / 100) > 0) {
+            str += a[Math.floor(n / 100)] + " Hundred ";
+            n %= 100;
+        }
+        if (n > 0) str += twoDigits(n);
+        return str.trim();
+    }
+
+    let result = "";
+
+    let crore = Math.floor(num / 10000000);
+    num %= 10000000;
+
+    let lakh = Math.floor(num / 100000);
+    num %= 100000;
+
+    let thousand = Math.floor(num / 1000);
+    num %= 1000;
+
+    if (crore) result += threeDigits(crore) + " Crore ";
+    if (lakh) result += threeDigits(lakh) + " Lakh ";
+    if (thousand) result += threeDigits(thousand) + " Thousand ";
+    if (num) result += threeDigits(num) + " ";
+
+    return result.trim();
+}
+
+function syncBuyer(){
+    document.getElementById("consigneeName").value =
+        document.getElementById("buyerName").value;
+
+    document.getElementById("consigneeAddress").value =
+        document.getElementById("buyerAddress").value;
+}
+
+</script>
+</body>
+</html>
